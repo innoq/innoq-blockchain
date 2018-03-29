@@ -1,6 +1,7 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const SSE = require('express-sse')
+const EventSource = require('eventsource')
 
 module.exports = (blockchain) => {
   const app = express()
@@ -52,6 +53,14 @@ module.exports = (blockchain) => {
 
     if (nodeId && host) {
       const node = blockchain.registerNode(nodeId, host)
+
+      // connect to node event stream
+      const eventSource = `${host}/events`
+      const stream = new EventSource(eventSource)
+      stream.addEventListener('new_block', (event) => {
+        console.log(`node ${host} found a new block: `, event.data)
+      })
+
       res.status(201).json({
         message: 'New node added',
         node
