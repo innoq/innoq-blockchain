@@ -1,9 +1,12 @@
 const express = require('express')
+const bodyParser = require('body-parser')
 const SSE = require('express-sse')
 
 module.exports = (blockchain) => {
   const app = express()
   const sse = new SSE(blockchain.chaindata)
+
+  app.use(bodyParser.json())
 
   app.get('/node', (req, res) => {
     res.json({
@@ -34,6 +37,30 @@ module.exports = (blockchain) => {
       message: 'New block found',
       block: newBlock
     })
+  })
+
+  app.get('/info', (req, res) => {
+    res.json({
+      nodeId: blockchain.nodeId,
+      currentBlockHeight: blockchain.chaindata.length,
+      neighbours: blockchain.getNodes()
+    })
+  })
+
+  app.post('/nodes/register', (req, res) => {
+    const { nodeId, host } = req.body || []
+
+    if (nodeId && host) {
+      const node = blockchain.registerNode(nodeId, host)
+      res.status(201).json({
+        message: 'New node added',
+        node
+      })
+    } else {
+      res.status(400).json({
+        message: 'Error: no node provided'
+      })
+    }
   })
 
   return app
