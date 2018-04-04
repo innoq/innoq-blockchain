@@ -44,11 +44,11 @@ BTW: nodeId is currently unused but has to be supplied.
 
 ## Blockchain-API
 
-| Resource                | Description                                          |
-| :---------------------- | :--------------------------------------------------- |
-| GET  /                  | node info, blockheight, neighbours                   |
-| GET  /chain             | get nodes chain                                      |
-| GET  /mine              | mine a new block                                     |
-| GET  /events            | node events sse stream                               |
-| POST /nodes/register    | register new node                                    |
-| GET /nodes/resolveChain | resolve chain with longer chains of registered nodes |
+| Resource                | Description                                                  |
+| :---------------------- | :----------------------------------------------------------- |
+| GET  /                  | node info, blockheight, neighbours                           |
+| GET  /chain             | get nodes chain                                              |
+| GET  /mine              | mine a new block                                             |
+| GET  /events            | node events sse stream                                       |
+| POST /nodes/register    | register new node                                            |
+| GET /nodes/resolveChain | manually resolve chain with longer chain of registered nodes |
