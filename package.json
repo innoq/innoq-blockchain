@@ -8,7 +8,8 @@
   "private": true,
   "scripts": {
     "lint": "eslint --cache app.js lib/*.js lib/**/*.js",
-    "start": "NODE_ENV=development nodemon index.js"
+    "start": "NODE_ENV=development nodemon index.js",
+    "start2": "NODE_ENV=development PORT=8334 nodemon index.js"
   },
   "dependencies": {
     "body-parser": "^1.18.2",
@@ -16,6 +17,7 @@
     "eventsource": "^1.0.5",
     "express": "^4.16.3",
     "express-sse": "^0.4.1",
+    "node-fetch": "^2.1.2",
     "uuid": "^3.2.1"
   },
   "devDependencies": {

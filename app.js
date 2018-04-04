@@ -9,22 +9,30 @@ module.exports = (blockchain) => {
 
   app.use(bodyParser.json())
 
-  app.get('/node', (req, res) => {
+  app.get('/', (req, res) => {
+    console.log('GET / invoked')
+
     res.json({
-      nodeId: blockchain.nodeId
+      nodeId: blockchain.nodeId,
+      currentBlockHeight: blockchain.chaindata.length,
+      neighbours: blockchain.getNodes()
     })
   })
 
   app.get('/chain', (req, res) => {
+    console.log('GET /chain invoked')
+
     res.json({
       data: blockchain.chaindata,
-      height: blockchain.chaindata.length
+      blockHeight: blockchain.chaindata.length
     })
   })
 
   app.get('/events', sse.init)
 
   app.get('/mine', (req, res) => {
+    console.log('GET /mine invoked')
+
     const previousBlock = blockchain.previousBlock()
     const previousProof = previousBlock.proof
     const proof = blockchain.proofOfWork(previousProof)
@@ -32,6 +40,7 @@ module.exports = (blockchain) => {
     const previousBlockHash = blockchain.hash(previousBlock)
     const newBlock = blockchain.newBlock(proof, previousBlockHash)
 
+    console.log('We found a new block', newBlock)
     sse.send(newBlock, 'new_block')
 
     res.json({
@@ -40,25 +49,20 @@ module.exports = (blockchain) => {
     })
   })
 
-  app.get('/info', (req, res) => {
-    res.json({
-      nodeId: blockchain.nodeId,
-      currentBlockHeight: blockchain.chaindata.length,
-      neighbours: blockchain.getNodes()
-    })
-  })
-
   app.post('/nodes/register', (req, res) => {
+    console.log('POST /nodes/register invoked')
+
     const { nodeId, host } = req.body || []
 
     if (nodeId && host) {
       const node = blockchain.registerNode(nodeId, host)
 
-      // connect to node event stream
+      // connect to new node event stream
       const eventSource = `${host}/events`
       const stream = new EventSource(eventSource)
       stream.addEventListener('new_block', (event) => {
         console.log(`node ${host} found a new block: `, event.data)
+        blockchain.updateChain()
       })
 
       res.status(201).json({
@@ -70,6 +74,29 @@ module.exports = (blockchain) => {
         message: 'Error: no node provided'
       })
     }
+  })
+
+  app.get('/nodes/resolveChain', (req, res) => {
+    console.log('GET /nodes/resolveChain invoked')
+
+    blockchain.updateChain()
+      .then((updatedChain) => {
+        if (updatedChain) {
+          res.json({
+            message: 'Our chain was updated with a newer one.',
+            newChain: blockchain.chaindata
+          })
+        } else {
+          res.json({
+            message: 'Our chain is up to date.',
+            chain: blockchain.chaindata
+          })
+        }
+      })
+      .catch((err) => {
+        console.error('An error occured', err)
+        res.status(502).send('Could not update chain.')
+      })
   })
 
   return app
