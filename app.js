@@ -5,7 +5,7 @@ const EventSource = require('eventsource')
 
 module.exports = (blockchain) => {
   const app = express()
-  const sse = new SSE(blockchain.chaindata)
+  const sse = new SSE(blockchain.blocks)
 
   app.use(bodyParser.json())
 
@@ -14,7 +14,7 @@ module.exports = (blockchain) => {
 
     res.json({
       nodeId: blockchain.nodeId,
-      currentBlockHeight: blockchain.chaindata.length,
+      currentBlockHeight: blockchain.blocks.length,
       neighbours: blockchain.getNodes()
     })
   })
@@ -23,8 +23,8 @@ module.exports = (blockchain) => {
     console.log('GET /chain invoked')
 
     res.json({
-      data: blockchain.chaindata,
-      blockHeight: blockchain.chaindata.length
+      blocks: blockchain.blocks,
+      blockHeight: blockchain.blocks.length
     })
   })
 
@@ -84,12 +84,12 @@ module.exports = (blockchain) => {
         if (updatedChain) {
           res.json({
             message: 'Our chain was updated with a newer one.',
-            newChain: blockchain.chaindata
+            newChain: blockchain.blocks
           })
         } else {
           res.json({
             message: 'Our chain is up to date.',
-            chain: blockchain.chaindata
+            chain: blockchain.blocks
           })
         }
       })
