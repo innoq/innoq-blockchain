@@ -21,10 +21,7 @@ Use curl commands to connect node to each other:
 # add node http://localhost:8334 to http://localhost:8333
 curl -X POST http://localhost:8333/nodes/register \
   -H 'Content-Type: application/json' \
-  -d '{
-	"nodeId": "f788cd02-c4fd-4135-bd6d-d054b98983c9",
-	"host": "http://localhost:8334"
-}'
+  -d '{ "host": "http://localhost:8334" }'
 ```
 
 and vice versa:
@@ -33,10 +30,7 @@ and vice versa:
 add node http://localhost:8333 to http://localhost:8334
 curl -X POST http://localhost:8334/nodes/register \
   -H 'Content-Type: application/json' \
-  -d '{
-	"nodeId": "688c3458-81a4-4532-9d43-73e064efa3da",
-	"host": "http://localhost:8333"
-}'
+  -d '{ "host": "http://localhost:8333" }'
 ```
 
 BTW: nodeId is currently unused but has to be supplied.

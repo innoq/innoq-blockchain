@@ -2,6 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const SSE = require('express-sse')
 const EventSource = require('eventsource')
+const fetch = require('node-fetch')
 
 module.exports = (blockchain) => {
   const app = express()
@@ -15,7 +16,7 @@ module.exports = (blockchain) => {
     res.json({
       nodeId: blockchain.nodeId,
       currentBlockHeight: blockchain.blocks.length,
-      neighbours: blockchain.getNodes()
+      neighbours: blockchain.nodes
     })
   })
 
@@ -52,28 +53,33 @@ module.exports = (blockchain) => {
   app.post('/nodes/register', (req, res) => {
     console.log('POST /nodes/register invoked')
 
-    const { nodeId, host } = req.body || []
+    const { host } = req.body || []
 
-    if (nodeId && host) {
-      const node = blockchain.registerNode(nodeId, host)
+    fetch(host)
+      .then(res => {
+        if (res.ok) return res.json()
+      })
+      .then(fetchedNode => {
+        const node = blockchain.registerNode(fetchedNode.nodeId, host)
 
-      // connect to new node event stream
-      const eventSource = `${host}/events`
-      const stream = new EventSource(eventSource)
-      stream.addEventListener('new_block', (event) => {
-        console.log(`node ${host} found a new block: `, event.data)
-        blockchain.updateChain()
-      })
+        // connect to new node event stream
+        const eventSource = `${host}/events`
+        const stream = new EventSource(eventSource)
+        stream.addEventListener('new_block', (event) => {
+          console.log(`node ${host} found a new block: `, event.data)
+          blockchain.updateChain()
+        })
 
-      res.status(201).json({
-        message: 'New node added',
-        node
+        res.status(201).json({
+          message: 'New node added',
+          node
+        })
+      }).catch(err => {
+        console.error('An error occured', err)
+        res.status(400).json({
+          message: 'Error: could not add node'
+        })
       })
-    } else {
-      res.status(400).json({
-        message: 'Error: no node provided'
-      })
-    }
   })
 
   app.get('/nodes/resolveChain', (req, res) => {
