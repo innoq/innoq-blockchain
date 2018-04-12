@@ -19,7 +19,8 @@ module.exports = (blockchain) => {
   app.get('/blocks', (req, res) => blocksController.index(blockchain, req, res))
   app.get('/blocks/:id', (req, res) => blocksController.get(blockchain, req, res))
   app.get('/mine', (req, res) => miningController.mine(blockchain, sse, req, res))
-  app.get('/transactions', (req, res) => transactionsController.get(blockchain, req, res))
+  app.get('/transactions/:id', (req, res) => transactionsController.get(blockchain, req, res))
+  app.post('/transactions', (req, res) => transactionsController.new(blockchain, sse, req, res))
   app.post('/nodes/register', (req, res) => nodesController.register(blockchain, req, res))
   app.get('/nodes/resolveChain', (req, res) => nodesController.resolveChain(blockchain, req, res))
 

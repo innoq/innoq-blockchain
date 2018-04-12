@@ -3,7 +3,7 @@ const Blockchain = require('./lib/blockchain')
 const utils = require('./lib/utils')
 
 const port = process.env.PORT || 8333
-const nodeId = utils.generateNodeId()
+const nodeId = utils.generateUUID()
 const blockchain = new Blockchain(nodeId)
 const app = App(blockchain)
 

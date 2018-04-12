@@ -41,7 +41,11 @@ BTW: nodeId is currently unused but has to be supplied.
 | Resource                | Description                                                  |
 | :---------------------- | :----------------------------------------------------------- |
 | GET  /                  | node info, blockheight, neighbours                           |
-| GET  /chain             | get nodes chain                                              |
+| GET  /blocks            | get nodes chain                                              |
+| GET  /blocks/:id        | get specific block                                           |
+| GET  /transactions      | show transactions                                            |
+| GET  /transactions/:id  | get specific transaction                                     |
+| POST /transactions      | post a new transaction                                       |
 | GET  /mine              | mine a new block                                             |
 | GET  /events            | node events sse stream                                       |
 | POST /nodes/register    | register new node                                            |
