@@ -43,7 +43,7 @@ BTW: nodeId is currently unused but has to be supplied.
 | GET  /                  | node info, blockheight, neighbours                           |
 | GET  /blocks            | get nodes chain                                              |
 | GET  /blocks/:id        | get specific block                                           |
-| GET  /transactions      | show transactions                                            |
+| GET  /transactions      | list unconfirmed transactions                                |
 | GET  /transactions/:id  | get specific transaction                                     |
 | POST /transactions      | post a new transaction                                       |
 | GET  /mine              | mine a new block                                             |
