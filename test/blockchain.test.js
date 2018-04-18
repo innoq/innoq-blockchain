@@ -48,51 +48,66 @@ describe('Blockchain', () => {
 
   test('block creation based on genesis block', () => {
     const previousBlock = blockchain.previousBlock()
-    const lastProof = previousBlock.proof
-    const proof = blockchain.proofOfWork(lastProof)
     const previousBlockHash = blockchain.hash(previousBlock)
-    const block = blockchain.newBlock(proof, previousBlockHash)
+    const candidateBlock = blockchain.candidateBlock(previousBlockHash)
+    const newBlock = blockchain.proofOfWork(candidateBlock)
+    const newBlockHash = blockchain.hash(newBlock)
+    blockchain.addBlock(newBlock)
 
     expect(blockchain.blocks).toHaveLength(2)
-    expect(blockchain.blocks[1]).toEqual(block)
-    expect(blockchain.blocks[1]).toMatchObject({
-      index: 2,
-      proof: 69732, // valid proof for our genesis block
-      transactions: []
-    })
+    expect(blockchain.blocks[1]).toEqual(newBlock)
+    expect(/^0000/.test(newBlockHash)).toEqual(true)
   })
 
   test('proof finding', () => {
-    const lastProof = 'I am Heribert Innoq'
+    const candidateBlock = {
+      index: 2,
+      timestamp: 1524027927349,
+      proof: 0,
+      transactions: [],
+      previousBlockHash: '0000008793d0a9aa91ab9c336103383a6cfa034506b89ccbd2c73be655cce22a'
+    }
 
-    const proof = blockchain.proofOfWork(lastProof)
-    const guess = `${lastProof}${proof}`
-    const guessHash = utils.sha256sum(guess)
+    const newBlock = blockchain.proofOfWork(candidateBlock)
+    const newBlockHash = blockchain.hash(newBlock)
 
-    expect(proof).toEqual(107168)
-    expect(guess).toEqual('I am Heribert Innoq107168')
-    expect(guessHash).toEqual('0000387af7c5fda617f0d39349b5d8b5ee437c338353621eec3a962870e6931e')
+    expect(newBlock.proof).toEqual(56624)
+    expect(newBlockHash).toEqual('0000cfce364bd41d74d4b402bd45f7f7c52e757bb9c34364a4225216b5f83ba0')
   })
 
   test('correct proof validation', () => {
-    const lastProof = 0
-    const proof = 69732
+    const candidateBlock = {
+      index: 2,
+      timestamp: 1524027927349,
+      proof: 56624,
+      transactions: [],
+      previousBlockHash: '0000008793d0a9aa91ab9c336103383a6cfa034506b89ccbd2c73be655cce22a'
+    }
 
-    const valid = blockchain.validateProof(lastProof, proof)
-    const guessHash = utils.sha256sum(`${lastProof}${proof}`)
+    const valid = blockchain.validateProof(candidateBlock)
 
-    expect(/^0000/.test(guessHash)).toEqual(true)
+    const blockString = JSON.stringify(candidateBlock, Object.keys(candidateBlock).sort())
+    const blockhash = utils.sha256sum(blockString)
+
+    expect(/^0000/.test(blockhash)).toEqual(true)
     expect(valid).toEqual(true)
   })
 
   test('false proof validation', () => {
-    const lastProof = 0
-    const proof = 123
+    const candidateBlock = {
+      index: 2,
+      timestamp: 1524027927349,
+      proof: 0,
+      transactions: [],
+      previousBlockHash: '0000008793d0a9aa91ab9c336103383a6cfa034506b89ccbd2c73be655cce22a'
+    }
 
-    const valid = blockchain.validateProof(lastProof, proof)
-    const guessHash = utils.sha256sum(`${lastProof}${proof}`)
+    const valid = blockchain.validateProof(candidateBlock)
 
-    expect(/^0000/.test(guessHash)).toEqual(false)
+    const blockString = JSON.stringify(candidateBlock, Object.keys(candidateBlock).sort())
+    const blockhash = utils.sha256sum(blockString)
+
+    expect(/^0000/.test(blockhash)).toEqual(false)
     expect(valid).toEqual(false)
   })
 
@@ -101,7 +116,7 @@ describe('Blockchain', () => {
       {
         index: 1,
         timestamp: 0,
-        proof: 0,
+        proof: 955977,
         transactions: [{
           id: 'b3c973e2-db05-4eb5-9668-3e81c7389a6d',
           timestamp: 0,
@@ -111,17 +126,10 @@ describe('Blockchain', () => {
       },
       {
         index: 2,
-        timestamp: 1523940019964,
-        proof: 69732,
+        timestamp: 1524036744098,
+        proof: 437,
         transactions: [],
-        previousBlockHash: '425ee67463c8968a5ca4e7e38c54e497d34d8bfa3bbb93fd7f9d801f7349bfb2'
-      },
-      {
-        index: 3,
-        timestamp: 1523940021147,
-        proof: 23263,
-        transactions: [],
-        previousBlockHash: 'c583b6f570333b0ba644e9c46e48cbeff0ddbe57a71317a356a87c66b1761889'
+        previousBlockHash: '0000008793d0a9aa91ab9c336103383a6cfa034506b89ccbd2c73be655cce22a'
       }
     ]
 
@@ -129,11 +137,11 @@ describe('Blockchain', () => {
   })
 
   test('false chain validation', () => {
-    const correctChain = [
+    const incorrectChain = [
       {
         index: 1,
         timestamp: 0,
-        proof: 0,
+        proof: 955977,
         transactions: [{
           id: 'b3c973e2-db05-4eb5-9668-3e81c7389a6d',
           timestamp: 0,
@@ -143,13 +151,13 @@ describe('Blockchain', () => {
       },
       {
         index: 2,
-        timestamp: 1523940019964,
-        proof: 69732,
+        timestamp: 1524028962190,
+        proof: 29270,
         transactions: [],
-        previousBlockHash: '##### This is a fake proof #####'
+        previousBlockHash: 'My Fake hash'
       }
     ]
 
-    expect(blockchain.validateChain(correctChain)).toEqual(false)
+    expect(blockchain.validateChain(incorrectChain)).toEqual(false)
   })
 })
