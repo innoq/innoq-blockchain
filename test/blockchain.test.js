@@ -160,4 +160,33 @@ describe('Blockchain', () => {
 
     expect(blockchain.validateChain(incorrectChain)).toEqual(false)
   })
+
+  test('adding transactions', () => {
+    expect(blockchain.getTransactions()).toHaveLength(0)
+    blockchain.newTransaction('My transaction')
+    expect(blockchain.getTransactions()).toHaveLength(1)
+  })
+
+  test('new blocks should include 5 transactions', () => {
+    expect(blockchain.getTransactions()).toHaveLength(0)
+    blockchain.newTransaction('My transaction 1')
+    blockchain.newTransaction('My transaction 2')
+    blockchain.newTransaction('My transaction 3')
+    blockchain.newTransaction('My transaction 4')
+    blockchain.newTransaction('My transaction 5')
+    blockchain.newTransaction('My transaction 6')
+    expect(blockchain.getTransactions()).toHaveLength(6)
+
+    const previousBlock = blockchain.previousBlock()
+    const previousBlockHash = blockchain.hash(previousBlock)
+    const candidateBlock = blockchain.candidateBlock(previousBlockHash)
+    const newBlock = blockchain.proofOfWork(candidateBlock)
+
+    expect(newBlock.transactions).toHaveLength(5)
+    expect(blockchain.getTransactions()).toHaveLength(6)
+
+    // one transactions after mining a new block
+    blockchain.addBlock(newBlock)
+    expect(blockchain.getTransactions()).toHaveLength(1)
+  })
 })
