@@ -47,6 +47,6 @@ BTW: nodeId is currently unused but has to be supplied.
 | GET  /transactions/:id  | get specific transaction                                     |
 | POST /transactions      | post a new transaction                                       |
 | GET  /mine              | mine a new block                                             |
-| GET  /events            | node events sse stream                                       |
+| GET  /events            | sse events stream (new_block, new_transaction, new_node)     |
 | POST /nodes/register    | register new node                                            |
 | GET /nodes/resolveChain | manually resolve chain with longer chain of registered nodes |
