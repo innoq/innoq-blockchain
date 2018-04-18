@@ -22,7 +22,7 @@ module.exports = (blockchain) => {
   app.get('/transactions/:id', (req, res) => transactionsController.get(blockchain, req, res))
   app.get('/transactions', (req, res) => transactionsController.index(blockchain, req, res))
   app.post('/transactions', (req, res) => transactionsController.new(blockchain, sse, req, res))
-  app.post('/nodes/register', (req, res) => nodesController.register(blockchain, req, res))
+  app.post('/nodes/register', (req, res) => nodesController.register(blockchain, sse, req, res))
   app.delete('/nodes/:id', (req, res) => nodesController.unregister(blockchain, req, res))
   app.get('/nodes/resolveChain', (req, res) => nodesController.resolveChain(blockchain, req, res))
 
