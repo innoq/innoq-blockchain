@@ -33,9 +33,6 @@ curl -X POST http://localhost:8334/nodes/register \
   -d '{ "host": "http://localhost:8333" }'
 ```
 
-BTW: nodeId is currently unused but has to be supplied.
-
-
 ## Blockchain-API
 
 | Resource                | Description                                                  |
