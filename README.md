@@ -1,6 +1,6 @@
 # INNOQ blockchain
 
-INNOQ programming event proof of concept blockchain.
+INNOQ programming event proof of concept reference blockchain.
 
 ## Prerequisites
 
